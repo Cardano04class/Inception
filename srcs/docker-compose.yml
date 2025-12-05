@@ -1,0 +1,18 @@
+services:
+  nginx:
+    container_name: nginx
+    # Change 'nginx' to a custom name, e.g., inception_nginx
+    image: inception_nginx 
+    build: 
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+    # Ensure there are NO 'volumes:' entries that mount over /etc/nginx/ssl
+    restart: always
+    networks:
+      - inception
+
+networks:
+  inception:
+      driver: bridge
