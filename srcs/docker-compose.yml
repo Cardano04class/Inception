@@ -1,33 +1,40 @@
 services:
   nginx:
-    container_name: nginx
-    # Change 'nginx' to a custom name, e.g., inception_nginx
-    image: inception_nginx 
-    build: 
+    build:
       context: ./requirements/nginx
       dockerfile: Dockerfile
+    container_name: nginx
+    env_file:
+      - .env
     ports:
       - "443:443"
-    # Ensure there are NO 'volumes:' entries that mount over /etc/nginx/ssl
+    volumes:
+      - nginx-certs:/etc/nginx/certs
+      - nginx-html:/var/www/html
     restart: always
     networks:
       - inception
 
-
   mariadb:
-      build: ./requirements/mariadb
-      container_name: mariadb
-      env_file:
-        - .env
-      volumes:
-        - mariadb-data:/var/lib/mysql
-      restart: always
-      networks:
-        - inception
-      ports:
-        - "3306:3306"
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    container_name: mariadb
+    env_file:
+      - .env
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    restart: always
+    networks:
+      - inception
+    ports:
+      - "3306:3306"
+
 volumes:
+  nginx-certs:
+  nginx-html:
   mariadb-data:
+
 networks:
   inception:
-      driver: bridge
+    driver: bridge

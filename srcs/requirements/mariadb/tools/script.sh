@@ -1,36 +1,16 @@
-#!/bin/sh
-set -e
+#!/bin/bash
 
-# Directories
-mkdir -p /var/lib/mysql
-mkdir -p /run/mysqld
-chown -R mysql:mysql /var/lib/mysql /run/mysqld
+service mariadb start
 
-# Initialize DB if empty
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    echo "Initializing MariaDB..."
-    mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
+while ! mysqladmin ping --silent; do
+    sleep 1
+done
 
-    # Start temporary server in background
-    mysqld_safe --datadir=/var/lib/mysql &
-    pid="$!"
+mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
+mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
+mysql -e "FLUSH PRIVILEGES;"
 
-    # Wait until server is ready
-    until mysqladmin ping >/dev/null 2>&1; do
-        sleep 1
-    done
+service mariadb stop
 
-    # Create DB and users
-    mysql -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
-    mysql -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-    mysql -e "CREATE USER IF NOT EXISTS 'wp_admin'@'%' IDENTIFIED BY 'secure_admin_password';"
-    mysql -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';"
-    mysql -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO 'wp_admin'@'%';"
-    mysql -e "FLUSH PRIVILEGES;"
-
-    # Stop temporary server
-    mysqladmin shutdown
-fi
-
-# Start MariaDB as PID 1
-exec mysqld
+exec mysqld_safe 
