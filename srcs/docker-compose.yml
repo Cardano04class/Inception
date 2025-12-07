@@ -1,20 +1,4 @@
 services:
-  nginx:
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
-    container_name: nginx
-    env_file:
-      - .env
-    ports:
-      - "443:443"
-    volumes:
-      - nginx-certs:/etc/nginx/certs
-      - nginx-html:/var/www/html
-    restart: always
-    networks:
-      - inception
-
   mariadb:
     build:
       context: ./requirements/mariadb
@@ -30,10 +14,43 @@ services:
     ports:
       - "3306:3306"
 
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    container_name: wordpress
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress-data:/var/www/html
+    restart: always
+    networks:
+      - inception
+    ports:
+      - "9000:9000"
+
+  nginx:
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    env_file:
+      - .env
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress-data:/var/www/html:ro
+    restart: always
+    networks:
+      - inception
+    ports:
+      - "443:443"
+
 volumes:
-  nginx-certs:
-  nginx-html:
   mariadb-data:
+  wordpress-data:
 
 networks:
   inception:

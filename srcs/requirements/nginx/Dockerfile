@@ -1,18 +1,14 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y nginx openssl
+RUN apt-get update && apt-get install -y nginx openssl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /etc/nginx/ssl
-
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /etc/nginx/ssl/nginx.key \
-    -out /etc/nginx/ssl/nginx.crt \
-    -subj "/C=MA/ST=Benguerir/L=Benguerir/O=1337/OU=1337/CN=mamir.42.fr"
+RUN mkdir -p /etc/nginx/certs /var/www/html
 
 COPY conf/nginx.conf /etc/nginx/conf.d/default.conf
-RUN mkdir -p /var/www/html
-COPY index.html /var/www/html/index.html 
+COPY tools/start_nginx.sh /usr/local/bin/start_nginx.sh
+RUN chmod +x /usr/local/bin/start_nginx.sh
 
 EXPOSE 443
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/bin/start_nginx.sh"]
