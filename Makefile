@@ -1,30 +1,45 @@
-COMPOSE=docker-compose -f srcs/docker-compose.yml
+NAME = inception
+COMPOSE_FILE = srcs/docker-compose.yml
+DATA_PATH = /home/mamir/data
 
+all: setup build up
 
-all: build up
-
+setup:
+	@mkdir -p $(DATA_PATH)/wordpress
+	@mkdir -p $(DATA_PATH)/mariadb
 
 build:
-$(COMPOSE) build --no-cache
+	@docker-compose -f $(COMPOSE_FILE) build
 
-
-up: build
-$(COMPOSE) up -d
-
+up:
+	@docker-compose -f $(COMPOSE_FILE) up -d
 
 down:
-$(COMPOSE) down
+	@docker-compose -f $(COMPOSE_FILE) down
 
+stop:
+	@docker-compose -f $(COMPOSE_FILE) stop
 
-logs:
-$(COMPOSE) logs -f
+start:
+	@docker-compose -f $(COMPOSE_FILE) start
 
+restart:
+	@docker-compose -f $(COMPOSE_FILE) restart
 
 clean: down
-docker system prune -af --volumes
+	@docker system prune -a --force
+	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
 
+fclean: clean
+	@sudo rm -rf $(DATA_PATH)/wordpress/*
+	@sudo rm -rf $(DATA_PATH)/mariadb/*
 
-re: clean all
+re: fclean all
 
+ps:
+	@docker-compose -f $(COMPOSE_FILE) ps
 
-.PHONY: all build up down logs clean re
+logs:
+	@docker-compose -f $(COMPOSE_FILE) logs
+
+.PHONY: all setup build up down stop start restart clean fclean re ps logs

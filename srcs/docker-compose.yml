@@ -1,57 +1,58 @@
+version: "3.9"
+
 services:
   mariadb:
-    build:
-      context: ./requirements/mariadb
-      dockerfile: Dockerfile
+    build: ./requirements/mariadb
     container_name: mariadb
-    env_file:
-      - .env
+    env_file: .env
     volumes:
       - mariadb-data:/var/lib/mysql
-    restart: always
     networks:
       - inception
-    ports:
-      - "3306:3306"
+    restart: always
 
   wordpress:
-    build:
-      context: ./requirements/wordpress
-      dockerfile: Dockerfile
+    build: ./requirements/wordpress
     container_name: wordpress
-    env_file:
-      - .env
     depends_on:
       - mariadb
+    env_file: .env
     volumes:
       - wordpress-data:/var/www/html
-    restart: always
     networks:
       - inception
-    ports:
-      - "9000:9000"
+    restart: always
 
   nginx:
-    build:
-      context: ./requirements/nginx
-      dockerfile: Dockerfile
+    build: ./requirements/nginx
     container_name: nginx
-    env_file:
-      - .env
     depends_on:
       - wordpress
-    volumes:
-      - wordpress-data:/var/www/html:ro
-    restart: always
-    networks:
-      - inception
     ports:
       - "443:443"
+    volumes:
+      - wordpress-data:/var/www/html
+    env_file: .env
+    networks:
+      - inception
+    restart: always
 
 volumes:
   mariadb-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/mamir/data/mariadb
+      o: bind
+
   wordpress-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/mamir/data/wordpress
+      o: bind
 
 networks:
   inception:
     driver: bridge
+    name: inception
