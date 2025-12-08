@@ -81,14 +81,11 @@ make fclean
 Open in your browser:
 
 ```
-https://localhost
+https://login.42.fr
 ```
-
-(or your configured domain)
-
 ### **WordPress admin panel**
 ```
-https://localhost/wp-admin
+https://login.42.fr/wp-admin
 ```
 
 Login with the admin credentials you configured during WordPress setup.
@@ -138,7 +135,7 @@ docker logs mariadb
 Open:
 
 ```
-https://localhost
+https://login.42.fr
 ```
 
 If the website loads → the stack is running correctly.

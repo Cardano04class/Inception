@@ -20,11 +20,11 @@ Before starting development, install:
 A `.env` file must be placed in the project's root:
 
 ```
-MYSQL_DATABASE=inception
-MYSQL_USER=wp_user
-MYSQL_PASSWORD=wp_pass
-MYSQL_ROOT_PASSWORD=root_pass
-DOMAIN_NAME=localhost
+MYSQL_DATABASE=
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_ROOT_PASSWORD=
+DOMAIN_NAME=
 ```
 
 This file provides environment variables for Docker Compose.
