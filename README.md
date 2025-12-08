@@ -91,75 +91,74 @@ manually.
 
 ### **Design Choices & Docker Usage**
 
-The project uses Docker to create an isolated, reproducible, and modular
-web stack.\
-Each service has: - Its own Dockerfile\
-- Its own container\
-- Its own role in the system
+The project uses Docker to create an isolated, reproducible, and modular web stack.  
+Each service has:
 
-**Why this design?** - Clear isolation between components\
-- Better security and reproducibility\
-- Deterministic environment\
-- Avoid dependency conflicts\
-- Faster redeployment
+- Its own Dockerfile  
+- Its own container  
+- Its own role in the system  
+
+**Why this design?**
+
+- Clear isolation between components  
+- Better security and reproducibility  
+- Deterministic environment  
+- Avoid dependency conflicts  
+- Faster redeployment  
+
+---
 
 ### **Comparisons**
 
+---
+
 #### **1. Virtual Machines vs Docker**
 
-  Virtual Machines            Docker Containers
-  --------------------------- -------------------------
-  Full OS per VM              Shared host kernel
-  Heavy, resource-intensive   Lightweight & fast
-  Slow startup                Instant startup
-  Strong isolation            Process-level isolation
-  Ideal for multi‑OS setups   Ideal for microservices
+| Virtual Machines            | Docker Containers        |
+|-----------------------------|---------------------------|
+| Full OS per VM              | Shared host kernel        |
+| Heavy, resource-intensive   | Lightweight & fast        |
+| Slow startup                | Instant startup           |
+| Strong isolation            | Process-level isolation   |
+| Ideal for multi-OS setups   | Ideal for microservices   |
+
+---
 
 #### **2. Secrets vs Environment Variables**
 
-  -----------------------------------------------------------------------
-  Environment Variables         Secrets (e.g., Docker Secrets)
-  ----------------------------- -----------------------------------------
-  Simple to use                 More secure
+| Environment Variables                  | Secrets (e.g., Docker Secrets)       |
+|----------------------------------------|--------------------------------------|
+| Simple to use                          | More secure                          |
+| Visible inside container with `env`    | Mounted as files, not environment    |
+| Stored in plain text                   | Encrypted / protected                |
+| OK for local projects                  | Recommended for production           |
 
-  Visible in container using    Mounted as files, not exposed in env
-  `env`                         
+For this project, `.env` is required by the subject and acceptable.
 
-  Stored in plain text          Encrypted / protected
-
-  OK for local projects         Recommended for production
-  -----------------------------------------------------------------------
-
-For this project, `.env` is required by the subject and considered
-acceptable.
+---
 
 #### **3. Docker Network vs Host Network**
 
-  -----------------------------------------------------------------------
-  Docker Network                        Host Network
-  ------------------------------------- ---------------------------------
-  Isolated                              Shares host network namespace
-
-  Services discover each other by       Full access to host ports
-  container name                        
-
-  More secure                           Less secure
-
-  Enables virtual private networks      Higher risk of port conflicts
-  -----------------------------------------------------------------------
+| Docker Network                                | Host Network                        |
+|-----------------------------------------------|-------------------------------------|
+| Isolated                                       | Shares host network namespace       |
+| Services reach each other by container name    | Full access to host ports           |
+| More secure                                    | Less secure                         |
+| Virtual private networks supported             | Risk of port conflicts              |
 
 This project uses a **Docker bridge network** for isolation.
 
+---
+
 #### **4. Docker Volumes vs Bind Mounts**
 
-  Bind Mounts                    Volumes
-  ------------------------------ ------------------------
-  Direct host → container path   Managed by Docker
-  Good for development           Good for production
-  Must manage host permissions   Docker handles storage
-  Faster to modify               More stable long-term
+| Bind Mounts                        | Volumes                         |
+|-----------------------------------|---------------------------------|
+| Direct host → container path      | Managed by Docker               |
+| Good for development              | Good for production             |
+| Host permissions must be managed  | Docker manages storage          |
+| Fast file modifications           | More stable long-term           |
 
-The project uses **Bind Mounts**, because the subject requires mounting
-to `/home/login/data`.
+The project uses **Bind Mounts**, because the subject requires mounting to `/home/login/data`.
 
-------------------------------------------------------------------------
+---
